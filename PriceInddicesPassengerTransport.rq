@@ -1,0 +1,45 @@
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX coicop: <http://dd.eionet.europa.eu/vocabulary/eurostat/coicop/> 
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+
+SELECT DISTINCT
+year(?date) as ?date
+?ugeo
+bif:either(?coicop_label = 'Motor cars', 'Passenger cars', ?coicop_label) as ?coicop_label
+?value
+?total
+round((?value/?total)*1000)/10.0 as ?ratio
+
+WHERE {
+{  
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/prc_hicp_aind.rdf.gz> 
+  { 
+    _:prc_hicp_aind sdmx-dimension:refArea ?geo .
+    _:prc_hicp_aind sdmx-attribute:unitMeasure unit:INX_A_AVG .
+    _:prc_hicp_aind sdmx-dimension:timePeriod ?date . 
+
+    _:prc_hicp_aind property:coicop ?coicop .
+    FILTER (?coicop in (coicop:CP07, coicop:CP0711, coicop:CP072, coicop:CP0731, 
+             coicop:CP0732, coicop:CP0733, coicop:CP0734))
+    _:prc_hicp_aind sdmx-measure:obsValue ?value .
+  
+    _:prc_hicp_aind_tot sdmx-dimension:refArea ?geo .
+    _:prc_hicp_aind_tot sdmx-attribute:unitMeasure unit:INX_A_AVG .
+    _:prc_hicp_aind_tot sdmx-dimension:timePeriod ?date .
+    _:prc_hicp_aind_tot property:coicop coicop:CP00 .
+    _:prc_hicp_aind_tot sdmx-measure:obsValue ?total .
+
+   } 
+  }
+  ?geo rdfs:label ?ugeo . 
+  ?coicop rdfs:label ?coicop_label .
+  FILTER (year(?date) > 1995)
+
+}
+GROUP BY ?date ?ugeo ?coicop_label
+ORDER BY ?date ?ugeo

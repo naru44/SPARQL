@@ -1,0 +1,43 @@
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX product: <http://dd.eionet.europa.eu/vocabulary/eurostat/product/>
+PREFIX indic_nrg: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_nrg/>
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
+PREFIX indic_de: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_de/>
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+
+SELECT 
+year(?date) as ?date
+bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo
+round((sum(?tsdpc320)*1000.0)/sum(?demo_gind)*10000.0)/10.0 as ?index
+sum(?demo_gind) as ?demo_gind
+sum(?tsdpc320) as ?tsdpc320
+WHERE {
+{
+
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/demo_gind.rdf.gz> 
+    {
+    _:demo_gind sdmx-dimension:timePeriod ?date .
+    _:demo_gind sdmx-dimension:refArea ?geo .
+    _:demo_gind property:indic_de indic_de:AVG .
+    _:demo_gind sdmx-measure:obsValue ?demo_gind .
+    }
+} UNION {
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/tsdpc320.rdf.gz>
+    {
+    _:tsdpc320 sdmx-dimension:timePeriod ?date .
+    _:tsdpc320 property:indic_nrg indic_nrg:B_102010 .
+    _:tsdpc320 sdmx-dimension:refArea ?geo .
+    _:tsdpc320 property:product product:0000 .
+    _:tsdpc320 sdmx-attribute:unitMeasure unit:KTOE .
+    _:tsdpc320 sdmx-measure:obsValue ?tsdpc320 .
+    } 
+ } 
+?geo rdfs:label ?ugeo .
+FILTER (year(?date) in (2005, 2015))
+} GROUP BY year(?date) ?geo ?ugeo
+HAVING (sum(?tsdpc320)/sum(?demo_gind) > 0)

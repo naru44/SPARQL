@@ -1,0 +1,56 @@
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX indic_to: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_to/>
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX nace_r2: <http://dd.eionet.europa.eu/vocabulary/eurostat/nace_r2/>
+PREFIX countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+SELECT DISTINCT
+year(?date) as ?date
+?ugeo
+round(?obsValue/1000000) as ?obsValue
+
+WHERE {
+  { 
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/tour_occ_arn2.rdf.gz> 
+    {
+      _:tour_occ_arn2 sdmx-dimension:timePeriod ?date . 
+      _:tour_occ_arn2 sdmx-dimension:refArea ?geo . 
+      _:tour_occ_arn2 property:indic_to indic_to:B003 . 
+      _:tour_occ_arn2 sdmx-attribute:unitMeasure unit:NR . 
+      _:tour_occ_arn2 property:nace_r2 nace_r2:I551-I553 . 
+      _:tour_occ_arn2 sdmx-measure:obsValue ?obsValue .
+    }
+   } UNION {
+    { SELECT 
+        "2015-12-31"^^xsd:date as ?date
+        <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/UK> as ?geo 
+        106421227 as ?obsValue {} 
+      }
+   } UNION {
+    { SELECT 
+        "2015-12-31"^^xsd:date as ?date
+        <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/BA> as ?geo 
+        846581 as ?obsValue {} 
+      }
+   } UNION {
+    { SELECT 
+        "2015-12-31"^^xsd:date as ?date
+        <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/TR> as ?geo 
+        43514295 as ?obsValue {} 
+      }
+   } UNION {
+    { SELECT 
+        "2015-12-31"^^xsd:date as ?date
+        <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/CH> as ?geo 
+        19090000 as ?obsValue {} 
+      }
+  }
+  ?geo skos:exactMatch ?eeauri .
+  ?eeauri skos:inScheme countries: .
+  ?eeauri rdfs:label ?ugeo .
+
+}
+ORDER BY ?year(?date) ?ugeo

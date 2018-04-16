@@ -1,0 +1,49 @@
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX faostat: <http://reference.eionet.europa.eu/faostat/schema/>
+
+SELECT DISTINCT
+?date
+?itemCode
+?item
+?elementCode
+bif:either(?elementCode = 674, 'Protein supply quantity', 'Food supply quantity') as ?element
+#?element
+'kg/capita/yr' as ?unit
+#0.375 converts g/capita/day to kg/capita/yr
+bif:either(?elementCode = 674, round(sum(xsd:decimal(?value)) *0.365*10)/10.0, round(sum(xsd:decimal(?value))*10)/10.0 ) as ?value
+WHERE {
+    GRAPH <http://r.eionet.europa.eu/rdfdumps/faostat/foodsupply_livestockfish_e.rdf.gz> {
+    {
+      _:foodsupply_livestockfish_e faostat:area ?area .
+      _:foodsupply_livestockfish_e sdmx-dimension:refArea ?refArea .
+      {
+        _:foodsupply_livestockfish_e faostat:item_code ?itemCode .
+        FILTER (?itemCode in (2731, 2738, 2741, 2733, 2743, 2732, 
+                              2731, 2734, 2761, 2762, 2740, 2763, 2744))
+        _:foodsupply_livestockfish_e faostat:item ?item .
+      } UNION {
+        { SELECT 'Meat, other + edible offals' as ?item {} }
+        _:foodsupply_livestockfish_e faostat:item_code ?itemCodeDummy .
+        FILTER (?itemCodeDummy in ( 2763, 2735 ))
+
+      } UNION {
+        { SELECT 'Other fish and seafood' as ?item {} }
+        _:foodsupply_livestockfish_e faostat:item_code ?itemCodeDummy .
+        FILTER (?itemCodeDummy in (2767, 2764, 2766, 2765))
+      }
+
+      _:foodsupply_livestockfish_e faostat:element_code ?elementCode .
+      FILTER (?elementCode in (674, 645))
+ 
+      _:foodsupply_livestockfish_e faostat:element ?element .
+      _:foodsupply_livestockfish_e faostat:unit ?unit .
+      _:foodsupply_livestockfish_e sdmx-dimension:timePeriod ?date . 
+      FILTER (?date >= 1995)
+      _:foodsupply_livestockfish_e sdmx-measure:obsValue ?value .
+    }
+
+  }
+  FILTER (?refArea = 5706)
+}

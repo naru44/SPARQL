@@ -1,0 +1,32 @@
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX common_countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+
+SELECT DISTINCT
+year(?date) as ?date
+?ugeo
+?indic_en_label
+#?unit
+?obsValue
+
+WHERE {
+ GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/nrg_ind_335a.rdf.gz> 
+ { 
+    _:nrg_ind_335a sdmx-dimension:timePeriod ?date . 
+    _:nrg_ind_335a property:indic_en ?indic_en . 
+    _:nrg_ind_335a sdmx-dimension:refArea ?geo . 
+    _:nrg_ind_335a sdmx-attribute:unitMeasure ?unit . 
+    _:nrg_ind_335a sdmx-measure:obsValue ?obsValue .
+
+ } 
+ ?indic_en rdfs:label ?indic_en_label .
+ ?geo skos:exactMatch ?eeauri .
+ ?eeauri skos:inScheme common_countries: .
+ ?eeauri rdfs:label ?ugeo .
+}
+
+order by ?date
