@@ -19,13 +19,7 @@ PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
 PREFIX bif: <bif:>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT 
-year(?date) as ?date
-bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo
-round((sum(?tsdpc320)*1000.0)/sum(?demo_gind)*10000.0)/10.0 as ?index
-sum(?demo_gind) as ?demo_gind
-sum(?tsdpc320) as ?tsdpc320
-WHERE {
+SELECT (year(?date) as ?date) (bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo) (round((sum(?tsdpc320)*1000.0)/sum(?demo_gind)*10000.0)/10.0 as ?index) (sum(?demo_gind) as ?demo_gind) (sum(?tsdpc320) as ?tsdpc320) WHERE {
 {
 
   GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/demo_gind.rdf.gz> 
