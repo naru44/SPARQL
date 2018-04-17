@@ -1,3 +1,10 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Retrieves Energy Consumption per Household per Capita in Europe
+#+ tags: 
+#+  - Environment
+#+  - Energy
+
+
 PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
 PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
 PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
@@ -9,6 +16,7 @@ PREFIX indic_nrg: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_nrg/>
 PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
 PREFIX indic_de: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_de/>
 PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX bif: <bif:>
 
 SELECT 
 year(?date) as ?date
