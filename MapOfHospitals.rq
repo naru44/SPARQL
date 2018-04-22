@@ -1,5 +1,7 @@
 #+ endpoint: https://query.wikidata.org/sparql
 #+ summary: Retrieves information of hospitals to be drawn on a map
+#+ tags: 
+#+  - Geography
 
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
