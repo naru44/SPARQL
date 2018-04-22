@@ -1,3 +1,9 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Total tourism arrivals in Europe
+#+ tags: 
+#+  - Geography
+
+
 PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
 PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
 PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
@@ -7,6 +13,9 @@ PREFIX indic_to: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_to/>
 PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
 PREFIX nace_r2: <http://dd.eionet.europa.eu/vocabulary/eurostat/nace_r2/>
 PREFIX countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
 SELECT DISTINCT
 year(?date) as ?date
 ?ugeo
