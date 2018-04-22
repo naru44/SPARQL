@@ -6,6 +6,8 @@ PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#>
 PREFIX coicop: <http://dd.eionet.europa.eu/vocabulary/eurostat/coicop/> 
 PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
 PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT DISTINCT
 year(?date) as ?date
