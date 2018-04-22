@@ -1,3 +1,9 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Share of renewable energy in Europe
+#+ tags: 
+#+  - Environment
+#+  - Energy
+
 PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
 PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
 PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
@@ -5,6 +11,8 @@ PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#>
 PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
 PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
 PREFIX common_countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT DISTINCT
 year(?date) as ?date
