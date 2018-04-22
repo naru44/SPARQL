@@ -11,17 +11,7 @@ PREFIX faostat: <http://reference.eionet.europa.eu/faostat/schema/>
 PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX xsd: <https://www.w3.org/2001/XMLSchema#>
 
-SELECT DISTINCT
-?date
-?itemCode
-?item
-?elementCode
-bif:either(?elementCode = 674, 'Protein supply quantity', 'Food supply quantity') as ?element
-#?element
-'kg/capita/yr' as ?unit
-#0.375 converts g/capita/day to kg/capita/yr
-bif:either(?elementCode = 674, round(sum(xsd:decimal(?value)) *0.365*10)/10.0, round(sum(xsd:decimal(?value))*10)/10.0 ) as ?value
-WHERE {
+SELECT DISTINCT ?date ?itemCode ?item ?elementCode (bif:either(?elementCode = 674, 'Protein supply quantity', 'Food supply quantity') as ?element) ('kg/capita/yr' as ?unit) (bif:either(?elementCode = 674, round(sum(xsd:decimal(?value)) *0.365*10)/10.0, round(sum(xsd:decimal(?value))*10)/10.0 ) as ?value) WHERE {
     GRAPH <http://r.eionet.europa.eu/rdfdumps/faostat/foodsupply_livestockfish_e.rdf.gz> {
     {
       _:foodsupply_livestockfish_e faostat:area ?area .
