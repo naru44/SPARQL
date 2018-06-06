@@ -19,7 +19,13 @@ PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
 PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT (year(?date) as ?date) (bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo) (round((sum(?tsdpc320)*1000.0)/sum(?demo_gind)*10000.0)/10.0 as ?index) (sum(?demo_gind) as ?demo_gind) (sum(?tsdpc320) as ?tsdpc320) WHERE {
+SELECT 
+year(?date) as ?date
+bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo
+round(((sum(?nrg_100a)*1000)/sum(?demo_gind))*100)/100.0 as ?index
+sum(?demo_gind) as ?demo_gind
+sum(?nrg_100a) as ?nrg_100a
+WHERE {
 {
 
   GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/demo_gind.rdf.gz> 
@@ -30,17 +36,20 @@ SELECT (year(?date) as ?date) (bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?u
     _:demo_gind sdmx-measure:obsValue ?demo_gind .
     }
 } UNION {
-  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/tsdpc320.rdf.gz>
-    {
-    _:tsdpc320 sdmx-dimension:timePeriod ?date .
-    _:tsdpc320 property:indic_nrg indic_nrg:B_102010 .
-    _:tsdpc320 sdmx-dimension:refArea ?geo .
-    _:tsdpc320 property:product product:0000 .
-    _:tsdpc320 sdmx-attribute:unitMeasure unit:KTOE .
-    _:tsdpc320 sdmx-measure:obsValue ?tsdpc320 .
-    } 
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/nrg_100a.rdf.gz> 
+  {
+    _:nrg_100a sdmx-dimension:refArea ?geo .
+    _:nrg_100a sdmx-attribute:unitMeasure unit:KTOE .
+    _:nrg_100a sdmx-dimension:timePeriod ?date .
+    _:nrg_100a property:product product:0000 .
+    _:nrg_100a property:indic_nrg indic_nrg:B_102010 .      
+    _:nrg_100a sdmx-measure:obsValue ?nrg_100a .
+
+  }
  } 
 ?geo rdfs:label ?ugeo .
-FILTER (year(?date) in (2005, 2015))
-} GROUP BY year(?date) ?geo ?ugeo
-HAVING (sum(?tsdpc320)/sum(?demo_gind) > 0)
+FILTER (year(?date) in (2005, 2016))
+} 
+GROUP BY year(?date) ?geo ?ugeo
+HAVING (sum(?nrg_100a)/sum(?demo_gind) > 0)
+ORDER BY ?date ?ugeo
