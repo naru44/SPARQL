@@ -1,0 +1,32 @@
+#+ endpoint: https://query.wikidata.org/sparql
+#+ summary: Metabolites and the species where they are found in
+#+ tags: 
+#+  - Population
+#+  - Biology
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?compound ?compoundLabel ?speciesLabel ?sourceLabel ?doi ?wpid WHERE {
+  ?compound wdt:P31 wd:Q11173.
+  MINUS { ?compound wdt:P31 wd:Q8054. }
+  ?compound p:P703 ?statement.
+  ?statement rdf:type wikibase:BestRank.
+  ?statement ps:P703 ?species.
+  OPTIONAL {
+    ?statement (prov:wasDerivedFrom/pr:P248) ?source.
+    OPTIONAL { ?statement (prov:wasDerivedFrom/pr:P2410) ?wpid. }
+    OPTIONAL { ?statement (prov:wasDerivedFrom/pr:P356) ?doi. }
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ASC(?compound)
