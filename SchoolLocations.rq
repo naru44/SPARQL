@@ -27,3 +27,4 @@ WHERE
     }
   ?place wdt:P31/wdt:P279* wd:Q3914 .
 }
+LIMIT 50
