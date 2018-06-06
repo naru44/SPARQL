@@ -1,0 +1,29 @@
+#+ endpoint: https://query.wikidata.org/sparql
+#+ summary: Retrieves information of hospitals to be drawn on a map
+#+ tags: 
+#+  - Population
+#+  - Genetics
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+
+#defaultView:TreeMap
+SELECT ?eyes ?hairColorLabel (COUNT(?person) as ?count)
+WHERE
+{
+	?person wdt:P1340 ?eyeColor.
+    ?person wdt:P1884 ?hairColor.
+    ?person wdt:P2048 ?height.
+    ?eyeColor rdfs:label ?_eyeColorLabel.
+    FILTER((LANG(?_eyeColorLabel)) = "en")
+    BIND(CONCAT(?_eyeColorLabel, " eyes") AS ?eyes)
+   
+	SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+GROUP BY ?eyes ?hairColorLabel
