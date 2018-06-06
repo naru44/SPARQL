@@ -2,7 +2,7 @@
 #+ summary: Retrieves information of hospitals to be drawn on a map
 #+ tags: 
 #+  - Population
-#+  - Genetics
+#+  - Biology
 
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
