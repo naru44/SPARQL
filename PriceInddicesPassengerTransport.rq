@@ -14,7 +14,15 @@ PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
 PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT DISTINCT (year(?date) as ?date) (?ugeo) (bif:either(?coicop_label = 'Motor cars', 'Passenger cars', ?coicop_label) as ?coicop_label) (?value) (?total) (round((?value/?total)*1000)/10.0 as ?ratio) WHERE {
+SELECT DISTINCT
+year(?date) as ?date
+?ugeo
+bif:either(?coicop_label = 'Motor cars', 'Passenger cars', ?coicop_label) as ?coicop_label
+?value
+?total
+round((?value/?total)*1000)/10.0 as ?ratio
+
+WHERE {
 {  
   GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/prc_hicp_aind.rdf.gz> 
   { 
