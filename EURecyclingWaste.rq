@@ -1,0 +1,84 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Total municipal waste recycled in each European country, stated in percentage
+#+ tags: 
+#+  - Environment
+#+  - Geography
+
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/> 
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/> 
+PREFIX wst: <http://dd.eionet.europa.eu/vocabulary/eurostat/wst_oper/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX common_countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT
+year(?date) as ?date_original
+bif:either(year(?date) <2009, 2004, 2016) as ?date
+
+bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo
+#round((sum(coalesce(?RCY_M,0))+sum(coalesce(?RCY_OC,0)))/sum(?GEN)*100) as ?value
+round((sum(?RCY_M)+sum(?RCY_OC))/sum(?GEN)*100) as ?value
+
+WHERE { 
+ GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/env_wasmun.rdf.gz> { 
+        _:env_wasmun sdmx-dimension:timePeriod ?date . 
+	_:env_wasmun sdmx-dimension:refArea ?geo .
+        _:env_wasmun sdmx-attribute:unitMeasure unit:THS_T .
+        { 
+	  _:env_wasmun property:wst_oper wst:GEN .
+          _:env_wasmun sdmx-measure:obsValue ?GEN . 
+	} UNION { 
+	  _:env_wasmun property:wst_oper wst:RCY_M . 
+          _:env_wasmun sdmx-measure:obsValue ?RCY_M . 
+	} UNION { 
+	  _:env_wasmun property:wst_oper wst:RCY_OC .
+          _:env_wasmun sdmx-measure:obsValue ?RCY_OC .
+	} 
+
+        {
+          SELECT 
+            min(?date) as ?date
+            ?geo
+            {
+               _:env_wasmun sdmx-dimension:timePeriod ?date . 
+               FILTER (?date >= "2004-01-01"^^xsd:dateTime)
+               _:env_wasmun sdmx-dimension:refArea ?geo .
+               { 
+	         _:env_wasmun property:wst_oper wst:RCY_M . 
+                 _:env_wasmun sdmx-measure:obsValue ?RCY_M . 
+	       } UNION { 
+	         _:env_wasmun property:wst_oper wst:RCY_OC .
+                 _:env_wasmun sdmx-measure:obsValue ?RCY_OC .
+ 	       } 
+            }
+        } UNION {
+          SELECT 
+            max(?date) as ?date
+            ?geo
+            {
+               _:env_wasmun sdmx-dimension:timePeriod ?date . 
+               FILTER (?date >= "2004-01-01"^^xsd:dateTime)
+               _:env_wasmun sdmx-dimension:refArea ?geo .
+               { 
+	         _:env_wasmun property:wst_oper wst:RCY_M . 
+                 _:env_wasmun sdmx-measure:obsValue ?RCY_M . 
+	       } UNION { 
+	         _:env_wasmun property:wst_oper wst:RCY_OC .
+                 _:env_wasmun sdmx-measure:obsValue ?RCY_OC .
+ 	       } 
+            }
+        }
+ 
+  }
+  ?geo rdfs:label ?ugeo .
+  FILTER (?geo != geo:AL && ?geo != geo:TR &&
+          ?geo != geo:CZ && ?geo != geo:IS && ?geo != geo:ME)
+} 
+GROUP BY ?ugeo ?geo ?date
+ORDER BY ?ugeo
