@@ -1,0 +1,47 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Resource productivity indexed (GDP/DMC)
+#+ tags: 
+#+  - Business
+#+  - Geography
+#+  - Population
+
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX rdf-schema: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX indic_nv: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_nv/>
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
+PREFIX common_countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+
+SELECT 
+bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?country
+year(?date) as ?date
+
+round((?tsdpc100/?tsdpc100_idx)*1000)/10.0 as ?index
+
+WHERE {
+{  
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/tsdpc100.rdf.gz> 
+  {
+    _:tsdpc100 sdmx-dimension:refArea ?geo .
+    _:tsdpc100 sdmx-dimension:timePeriod ?date .
+    _:tsdpc100 sdmx-attribute:unitMeasure unit:EUR_KG_CLV10 .
+    _:tsdpc100 sdmx-measure:obsValue ?tsdpc100  .
+
+    _:tsdpc100_idx sdmx-dimension:refArea ?geo .
+    _:tsdpc100_idx sdmx-dimension:timePeriod ?date_idx .
+    _:tsdpc100_idx sdmx-attribute:unitMeasure unit:EUR_KG_CLV10 .
+    _:tsdpc100_idx sdmx-measure:obsValue ?tsdpc100_idx  .
+    FILTER (year(?date_idx) = 2000)
+
+  } 
+  ?geo rdfs:label ?ugeo .
+ }
+}
+GROUP BY ?country
+ORDER BY ?country ?date
