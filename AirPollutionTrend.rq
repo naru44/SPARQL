@@ -1,0 +1,71 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Trend in emissions of air pollutants from transport
+#+ tags: 
+#+  - Environment
+
+PREFIX clrtap_nec_unfccc: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/schema/>
+PREFIX country: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/country/>
+PREFIX sector: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/>
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT
+?year 
+?pollutant_name
+#sum(xsd:double(?emissions)) as ?emissions
+#sum(xsd:double(?emissions_idx)) as ?emissions_idx
+xsd:double((round((sum(?emissions))/sum(?emissions_idx)*1000))/10.0) as ?index
+
+WHERE {{  
+  GRAPH <http://r.eionet.europa.eu/rdfdumps/clrtap_nec_unfccc/clrtap_nfr09_gf.rdf.gz> 
+  {
+   ?clrtap_nfr09_gf clrtap_nec_unfccc:country_code ?country_code .
+   ?clrtap_nfr09_gf clrtap_nec_unfccc:pollutant_name ?pollutant_name .
+   ?clrtap_nfr09_gf clrtap_nec_unfccc:year ?year .
+   ?clrtap_nfr09_gf clrtap_nec_unfccc:sector_code ?sector_code .
+   ?clrtap_nfr09_gf clrtap_nec_unfccc:emissions ?emissions .
+ 
+   { SELECT 
+       ?country_code
+       ?pollutant_name
+       ?sector_code
+       sum(?emissions_idx) as ?emissions_idx
+     WHERE {
+       ?clrtap_nfr09_gf_idx clrtap_nec_unfccc:country_code ?country_code .
+       ?clrtap_nfr09_gf_idx clrtap_nec_unfccc:pollutant_name ?pollutant_name .
+       ?clrtap_nfr09_gf_idx clrtap_nec_unfccc:year '1990' .
+       OPTIONAL { ?clrtap_nfr09_gf_idx clrtap_nec_unfccc:sector_code ?sector_code .
+       ?clrtap_nfr09_gf_idx clrtap_nec_unfccc:emissions ?emissions_idx . }
+     }
+   }
+
+   FILTER (?sector_code in (
+     sector:1A3bi,
+     sector:1A3bii,
+     sector:1A3biii,
+     sector:1A3biv,
+     sector:1A3bv,
+     sector:1A3bvi,
+     sector:1A3bvii,
+     sector:1A3c,
+     sector:1A3dii,
+     sector:1A4ciii,
+     <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/1A3di(i)>,
+     <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/1A3di(ii)>,
+     <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/1A3aii(i)>,
+     <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/1A3aii(ii)>,
+     <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/1A3ai(i)>,
+     <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/1A3ai(ii)>
+   ))
+   
+   FILTER (?pollutant_name in ('NOx', 'NMVOC', 'SOx'))
+   #to be changed with EEA33
+   FILTER (?country_code in (country:EU28, country:TR, country:NO, country:IS, country:LI, country:CH))
+
+   #FILTER (?pollutant_name in ('CO'))
+   #FILTER (?country_code in (country:EU28))
+  }
+}}
+GROUP BY ?year ?pollutant_name
+ORDER BY ?year ?pollutant_name
