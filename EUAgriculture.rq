@@ -2,7 +2,6 @@
 #+ summary: Gross nutrient balance on agricultural land
 #+ tags: 
 #+  - Environment
-#+  - Energy
 #+  - Geography
 
 PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
