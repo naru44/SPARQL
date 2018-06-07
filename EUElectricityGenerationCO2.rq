@@ -1,0 +1,141 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: CO2-emission intensity from electricity generation
+#+ tags: 
+#+  - Environment
+#+  - Geography
+#+  - Energy
+
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
+PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
+PREFIX product: <http://dd.eionet.europa.eu/vocabulary/eurostat/product/>
+PREFIX indic_nrg: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_nrg/>
+PREFIX clrtap_nec_unfccc: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/schema/>
+PREFIX sector: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/unfccc_crf_sector/>
+PREFIX unfccc_geo: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/country/>
+PREFIX common_countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
+
+SELECT DISTINCT 
+xsd:integer(?date) as ?date
+bif:either(?geo = geo:DE, 'Germany', ?ugeo) as ?ugeo
+'Electricity generation' as ?type
+round((?nom/?den)*10000.0)/10.0 as ?obsValue
+{{
+
+SELECT DISTINCT
+
+  xsd:integer(substr(xsd:string(?date), 1, 4)) as ?date
+  ?ugeo
+  ?geo
+  ((sum(xsd:double(?unfccc_crf))/1000.0) * (sum(?nrg_110a_0000_101021) - (sum(?nrg_110a_5200_101121)/0.9)) / ( sum(?nrg_110a_0000_101009) + sum(?nrg_110a_0000_101021) ) * (sum(?nrg_110a_0000_101022) - (sum(?nrg_110a_5200_101122)/0.9)) / (sum(?nrg_110a_0000_101021) - (sum(?nrg_110a_5200_101121)/0.9)) + (sum(xsd:double(?unfccc_crf))/1000.0) * (sum(?nrg_110a_0000_101021) - (sum(?nrg_110a_5200_101121)/0.9)) / ( sum(?nrg_110a_0000_101009) + sum(?nrg_110a_0000_101021) ) ) as ?nom
+
+  round(((sum(?nrg_110a_6000_101121) + sum(?nrg_105a_6000_101122) + sum(?nrg_110a_5200_101102)  + sum(?nrg_105a_6000_101200) )/85984.5227859)*10000.0)/10.0 as ?den
+
+  WHERE {
+      {
+
+      {{
+        SELECT
+          ?date
+          bif:either(?geo = unfccc_geo:EUA, geo:EU28, IRI(bif:concat( 'http://dd.eionet.europa.eu/vocabulary/eurostat/geo/', ?ugeo_unfccc))) as ?geo
+          ?unfccc_crf
+        WHERE {
+          GRAPH <http://r.eionet.europa.eu/rdfdumps/clrtap_nec_unfccc/unfccc_crf.rdf.gz> 
+          {
+            _:unfccc_crf clrtap_nec_unfccc:country_code ?geo .
+            _:unfccc_crf clrtap_nec_unfccc:year ?date .
+            FILTER (?date != '1985-1987')
+            {
+              _:unfccc_crf clrtap_nec_unfccc:unit 'Gg' .
+              _:unfccc_crf clrtap_nec_unfccc:pollutant_name 'CO2' .         
+              _:unfccc_crf clrtap_nec_unfccc:sector_code sector:1.A.1.a . 
+              _:unfccc_crf clrtap_nec_unfccc:emissions ?unfccc_crf .
+            }
+          }
+          ?geo skos:notation ?ugeo_unfccc .
+        }
+      }}
+
+      } UNION {
+      GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/nrg_105a.rdf.gz>
+        {
+          _:nrg_105a sdmx-dimension:timePeriod ?date . 
+          _:nrg_105a sdmx-dimension:refArea ?geo .
+          _:nrg_105a property:product product:6000 .
+          _:nrg_105a sdmx-attribute:unitMeasure unit:KTOE .
+          _:nrg_105a sdmx-measure:obsValue ?nrg_105a .
+          {
+            _:nrg_105a property:indic_nrg indic_nrg:B_101121 .
+            _:nrg_105a sdmx-measure:obsValue ?nrg_105a_6000_101121 .
+          } UNION {      
+            _:nrg_105a property:indic_nrg indic_nrg:B_101122 .
+            _:nrg_105a sdmx-measure:obsValue ?nrg_105a_6000_101122 .
+          } UNION {      
+            _:nrg_105a property:indic_nrg indic_nrg:B_101102 .
+            _:nrg_105a sdmx-measure:obsValue ?nrg_105a_6000_101102 .
+          } UNION {      
+            _:nrg_105a property:indic_nrg indic_nrg:B_101200 .
+            _:nrg_105a sdmx-measure:obsValue ?nrg_105a_6000_101200 .
+          }
+         }
+      } UNION {
+      GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/nrg_110a.rdf.gz>
+        {
+          _:nrg_110a sdmx-dimension:timePeriod ?date .
+          _:nrg_110a sdmx-attribute:unitMeasure unit:KTOE .
+          _:nrg_110a sdmx-dimension:refArea ?geo .
+
+          {
+            _:nrg_110a property:product product:6000 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101121 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_6000_101121 .
+          } UNION {      
+            _:nrg_110a property:product product:5200 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101122 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_5200_101122 .
+          } UNION {      
+            _:nrg_110a property:product product:6000 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101102 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_5200_101102 .
+          } UNION {      
+            _:nrg_110a property:product product:6000 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101200 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_5200_101200 .
+          } UNION {      
+            _:nrg_110a property:product product:0000 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101021 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_0000_101021 .
+          } UNION {      
+            _:nrg_110a property:product product:0000 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101022 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_0000_101022 .
+          } UNION {      
+            _:nrg_110a property:product product:5200 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101121 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_5200_101121 .
+          } UNION {      
+            _:nrg_110a property:product product:0000 .
+            _:nrg_110a property:indic_nrg indic_nrg:B_101009 .
+            _:nrg_110a sdmx-measure:obsValue ?nrg_110a_0000_101009 .
+          } 
+        } 
+      }
+      ?geo rdfs:label ?ugeo .
+      FILTER (?ugeo != 'Turkey' && ?ugeo != 'Norway' && 
+          ?ugeo != 'Lichtenstein' && ?ugeo != 'Switzerland' 
+          && ?ugeo != 'Iceland' )
+      #FILTER (?geo = geo:EU28)
+      FILTER (xsd:integer(substr(xsd:string(?date), 1, 4)) >= 1990) 
+    }
+GROUP BY xsd:integer(substr(xsd:string(?date), 1, 4)) ?ugeo ?geo
+}}
+GROUP BY ?date ?geo ?ugeo
+HAVING ?nom/?den > 0
+ORDER BY ?ugeo ?date
