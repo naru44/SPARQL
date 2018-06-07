@@ -1,0 +1,65 @@
+#+ endpoint: http://semantic.eea.europa.eu/sparql
+#+ summary: Gross nutrient balance on agricultural land
+#+ tags: 
+#+  - Environment
+#+  - Energy
+#+  - Geography
+
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
+PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
+PREFIX property: <http://rdfdata.eionet.europa.eu/eurostat/property#> 
+PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
+PREFIX nutrient: <http://dd.eionet.europa.eu/vocabulary/eurostat/nutrient/>
+PREFIX indic_ag: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_ag/>
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT
+year(?date) as ?date
+bif:either(?geo = geo:DE, 'Germany', bif:either(?geo = geo:EU, 'European Union', ?ugeo)) as ?ugeo
+?nutrient_label
+sum(xsd:double(?obsValue)) as ?obsValue
+
+WHERE {
+{
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/data/aei_pr_gnb.rdf.gz> 
+    {{
+      _:aei_pr_gnb sdmx-dimension:timePeriod ?date . 
+      _:aei_pr_gnb property:nutrient ?nutrient .
+      #FILTER (?nutrient = nutrient:N)
+      _:aei_pr_gnb sdmx-dimension:refArea ?geo . 
+      #FILTER (?geo = geo:EU)
+      _:aei_pr_gnb property:indic_ag indic_ag:BAL_UAA .
+      _:aei_pr_gnb sdmx-measure:obsValue ?obsValue .
+
+    } UNION {
+      SELECT xsd:date("2000-01-01") as ?date
+             nutrient:N as ?nutrient
+             geo:EU as ?geo
+             xsd:double(62.7) as ?obsValue WHERE {}
+    } UNION {
+      SELECT xsd:date("2001-01-01") as ?date
+             nutrient:N as ?nutrient
+             geo:EU as ?geo
+             xsd:double(60.5) as ?obsValue WHERE {}
+    } UNION {
+      SELECT xsd:date("2002-01-01") as ?date
+             nutrient:N as ?nutrient
+             geo:EU as ?geo
+             xsd:double(59.1) as ?obsValue WHERE {}
+    } UNION {
+      SELECT xsd:date("2003-01-01") as ?date
+             nutrient:N as ?nutrient
+             geo:EU as ?geo
+             xsd:double(65.1) as ?obsValue WHERE {}
+
+    }}
+    ?nutrient rdfs:label ?nutrient_label . 
+    ?geo rdfs:label ?ugeo .
+    FILTER (year(?date) >= 2000)
+  }
+}
+GROUP BY ?date ?nutrient_label ?ugeo ?geo ?nutrient
+ORDER BY ?date
