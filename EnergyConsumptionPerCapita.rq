@@ -16,7 +16,6 @@ PREFIX indic_nrg: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_nrg/>
 PREFIX geo: <http://dd.eionet.europa.eu/vocabulary/eurostat/geo/>
 PREFIX indic_de: <http://dd.eionet.europa.eu/vocabulary/eurostat/indic_de/>
 PREFIX unit: <http://dd.eionet.europa.eu/vocabulary/eurostat/unit/>
-PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT 
