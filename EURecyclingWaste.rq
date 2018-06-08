@@ -13,7 +13,6 @@ PREFIX wst: <http://dd.eionet.europa.eu/vocabulary/eurostat/wst_oper/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
 PREFIX common_countries: <http://dd.eionet.europa.eu/vocabulary/common/countries/>
-PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
