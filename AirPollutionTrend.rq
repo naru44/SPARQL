@@ -6,7 +6,6 @@
 PREFIX clrtap_nec_unfccc: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/schema/>
 PREFIX country: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/country/>
 PREFIX sector: <http://reference.eionet.europa.eu/clrtap_nec_unfccc/clrtap_nec_nfr09_sector/>
-PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
