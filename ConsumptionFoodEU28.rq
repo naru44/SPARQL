@@ -8,7 +8,6 @@ PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
 PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> 
 PREFIX sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> 
 PREFIX faostat: <http://reference.eionet.europa.eu/faostat/schema/>
-PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX xsd: <https://www.w3.org/2001/XMLSchema#>
 
 SELECT DISTINCT
