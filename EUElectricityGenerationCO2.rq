@@ -5,7 +5,6 @@
 #+  - Geography
 #+  - Energy
 
-PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#> 
